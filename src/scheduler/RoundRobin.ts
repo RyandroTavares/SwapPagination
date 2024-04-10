@@ -1,8 +1,8 @@
 import { ExecuteSchedulerResponse } from '../interfaces/ExecuteSchedulerResponse'
 import { Process } from '../process/Process'
 import { SubProcess } from '../process/SubProcess'
-import { CallType } from '../so/CallType'
-import { Operation } from '../so/Operation'
+import { SystemCallType } from '../so/SystemCallType'
+import { SystemOperation } from '../so/SystemOperation'
 import { SchedulerQueue } from './SchedulerQueue'
 import { SchedulerType } from './SchedulerType'
 
@@ -18,7 +18,10 @@ export class RoundRobin extends SchedulerQueue {
   public addSubProcess(process: Process): void {
     this.queueProcess.push(process)
 
-    const subProcesses = Operation.systemCall(CallType.REVIEW, undefined, process) as SubProcess[]
+    const subProcesses = SystemOperation.systemCall({
+      typeCall: SystemCallType.READ,
+      process,
+    }) as SubProcess[]
 
     subProcesses.forEach((sp) => {
       this.queueSubProcesses.push(sp)

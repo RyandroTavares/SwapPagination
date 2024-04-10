@@ -1,43 +1,38 @@
 import { Process } from '../process/Process'
-import { CallType } from './CallType'
+import { SystemCallType } from './SystemCallType'
 import { MemoryManager } from '../memory/MemoryManager'
 import { SubProcess } from '../process/SubProcess'
 import { Scheduler } from '../scheduler/Scheduler'
-import { Line } from '../scheduler/Line'
-import { Drawing } from '../scheduler/Drawing'
-import { IncreasingDescresing } from '../scheduler/IncreasingDescresing'
+import { FirstComeFirstServed } from '../scheduler/FirstComeFirstServed'
+import { Lottery } from '../scheduler/Lottery'
+import { ShortestJobFirst } from '../scheduler/ShortestJobFirst'
 import { Priority } from '../scheduler/Priority'
 import { RoundRobin } from '../scheduler/RoundRobin'
 import { HDManager } from '../memory/HDManager'
 
 interface SystemCallProps {
-  typeCall: CallType
+  typeCall: SystemCallType
   processSize?: number
   process?: Process
   priority?: number
 }
 
-//Drawing: Sorteio
-//Line: Primeiro a entrar primeiro a sair
-//RoundRobin: Tarefas são executadas em ordem circular, repartindo cada um em uma quantia especifica
-//IncreasingDescresing: Menor para o maior, maior para o menor
-//Priority: Prioridade do processo
-export class Operation {
+export class SystemOperation {
   public static memoryManager = new MemoryManager()
   public static hdManager = new HDManager()
   public static scheduler: Scheduler = new Priority()
 
-  public static systemCall(
-    typeCall : CallType,
-    processSize?: number,
-    process?: Process,
-    priority?: number
-  ): Process | void | SubProcess[] {
-    if (typeCall === CallType.CREATE_PROCESS && processSize && !process) {
+  public static systemCall({
+    typeCall,
+    processSize,
+    process,
+    priority,
+  }: SystemCallProps): Process | void | SubProcess[] {
+    if (typeCall === SystemCallType.CREATE && processSize && !process) {
       return new Process(processSize, priority)
     }
 
-    if (typeCall === CallType.WRITE_MEMORY && process) {
+    if (typeCall === SystemCallType.WRITE && process) {
       const checkWrite = this.memoryManager.checkWrite(process)
 
       if (checkWrite) {
@@ -57,20 +52,20 @@ export class Operation {
       }
     }
 
-    if (typeCall === CallType.REVIEW && process) {
+    if (typeCall === SystemCallType.READ && process) {
       return this.memoryManager.read(process)
     }
 
-    if (typeCall === CallType.DELETE_PROCESS && process) {
+    if (typeCall === SystemCallType.DELETE && process) {
       this.scheduler.close(process)
       return this.memoryManager.delete(process)
     }
 
-    if (typeCall === CallType.INTERRUPTION && process) {
+    if (typeCall === SystemCallType.STOP && process) {
       this.scheduler.close(process)
     }
 
-    if (typeCall === CallType.ARISE && process) {
+    if (typeCall === SystemCallType.WAKE && process) {
       const checkWrite = this.memoryManager.checkWrite(process)
 
       if (checkWrite) {

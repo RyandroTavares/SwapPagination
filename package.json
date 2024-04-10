@@ -6,7 +6,8 @@
   "scripts": {
     "start": "tsx src/main.ts",
     "lint": "eslint ./src --fix",
-    "build": "tsup src --out-dir build"
+    "build": "tsup src --out-dir build",
+    "build-test" :"tsc"
   },
   "keywords": [],
   "author": "",

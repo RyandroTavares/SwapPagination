@@ -1,19 +1,29 @@
 import { Process } from './process/Process'
-import { Priority } from './scheduler/Priority'
-import { CallType } from './so/CallType'
-import { Operation } from './so/Operation'
+import { SystemCallType } from './so/SystemCallType'
+import { SystemOperation } from './so/SystemOperation'
 
-//Cria os processos 1, 2 e 3. (Memória: 256)
-const p1 = Operation.systemCall(CallType.CREATE_PROCESS, 100)
-const p2 = Operation.systemCall(CallType.CREATE_PROCESS, 100)
-const p3 = Operation.systemCall(CallType.CREATE_PROCESS, 56)
+const p1 = SystemOperation.systemCall({typeCall: SystemCallType.CREATE, processSize: 99,})
+SystemOperation.systemCall({typeCall: SystemCallType.WRITE, process: p1 as Process,})
+const p2 = SystemOperation.systemCall({typeCall: SystemCallType.CREATE, processSize: 41,})
+SystemOperation.systemCall({typeCall: SystemCallType.WRITE, process: p2 as Process,})
+const p3 = SystemOperation.systemCall({typeCall: SystemCallType.CREATE, processSize: 57,})
+SystemOperation.systemCall({typeCall: SystemCallType.WRITE, process: p3 as Process,})
+const p4 = SystemOperation.systemCall({typeCall: SystemCallType.CREATE, processSize: 19,})
+SystemOperation.systemCall({typeCall: SystemCallType.WRITE, process: p4 as Process,})
+const p5 = SystemOperation.systemCall({typeCall: SystemCallType.CREATE, processSize: 40,})
+SystemOperation.systemCall({typeCall: SystemCallType.WRITE, process: p5 as Process,})
+const p6 = SystemOperation.systemCall({typeCall: SystemCallType.CREATE, processSize: 100,})
+SystemOperation.systemCall({typeCall: SystemCallType.WRITE, process: p6 as Process,})
 
-//Escreve na memória o processo 1, 2 e 3. (Prioridade 2)
-Operation.systemCall(CallType.WRITE_MEMORY, undefined, p1 as Process,)
-Operation.systemCall(CallType.WRITE_MEMORY, undefined, p2 as Process)
-Operation.systemCall(CallType.WRITE_MEMORY, undefined, p3 as Process)
 
-//Rever "CallType".
-// console.log(Operation.systemCall(CallType.REVIEW, undefined, p1 as Process))
-// SystemOperation.systemCall(SystemCallType.WAKE, undefined, p1 as Process)
-// SystemOperation.systemCall(SystemCallType.STOP, undefined, p3 as Process)
+console.log(SystemOperation.hdManager.getHd)
+
+// SystemOperation.systemCall({
+//   typeCall: SystemCallType.WAKE,
+//   process: p1 as Process,
+// })
+
+// SystemOperation.systemCall({
+//   typeCall: SystemCallType.WAKE,
+//   process: p2 as Process,
+// })

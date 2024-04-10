@@ -20,9 +20,9 @@ export class Core {
     type,
   }: Omit<ExecuteSchedulerResponse, 'element'>) {
     if (
-      type === SchedulerType.LINE ||
+      type === SchedulerType.FIRST_COME_FIRST_SERVED ||
       type === SchedulerType.ROUND_ROBIN ||
-      type === SchedulerType.DRAWING
+      type === SchedulerType.LOTTERY
     ) {
       console.log({ id: this._subProcess?.getId })
     }
@@ -34,7 +34,7 @@ export class Core {
       })
     }
 
-    if (type === SchedulerType.INCREASING_DESCRESING) {
+    if (type === SchedulerType.SHORTEST_JOB_FIRST) {
       console.log({ id: this._subProcess?.getId, timeExecution })
     }
 

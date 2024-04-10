@@ -1,8 +1,8 @@
 import { ExecuteSchedulerResponse } from '../interfaces/ExecuteSchedulerResponse'
 import { Process } from '../process/Process'
 import { SubProcess } from '../process/SubProcess'
-import { CallType } from '../so/CallType'
-import { Operation } from '../so/Operation'
+import { SystemCallType } from '../so/SystemCallType'
+import { SystemOperation } from '../so/SystemOperation'
 import { SchedulerQueue } from './SchedulerQueue'
 import { SchedulerType } from './SchedulerType'
 
@@ -33,7 +33,10 @@ export class Priority extends SchedulerQueue {
     const process = this.queueProcess.shift()
 
     if (process) {
-      const subProcess: SubProcess[] = Operation.systemCall(CallType.REVIEW, undefined, process) as SubProcess[]
+      const subProcess: SubProcess[] = SystemOperation.systemCall({
+        typeCall: SystemCallType.READ,
+        process,
+      }) as SubProcess[]
 
       subProcess.forEach((value) => {
         this.queueSubProcesses.push(value)

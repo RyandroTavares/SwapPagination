@@ -48,15 +48,12 @@ export class MemoryManager {
     this.allocateProcessWithPaging(process)
   }
 
-  //SWAP
   public swap(process: Process): Process[] {
-    const emptyFramesLength = this.findEmptyPages().length //Espaço vazio da memória
-    const quantityPages = process.getSize / MemoryManager.PAGE_SIZE //pega o tamanho da memoria 256 e divide por 4 quantia de processo
-
     const sleeps: Process[] = []
-    if (emptyFramesLength >= quantityPages) { //se o espaço do processo no HD for maior ou igual a quantidade de página da memória ele envia. ou visse versa.
-      return this.swap(process)
-    } else {
+    const quantityPages = process.getSize / MemoryManager.PAGE_SIZE
+
+    let emptyFramesLength = this.findEmptyPages().length
+    while (emptyFramesLength < quantityPages) {
       let firstProcess = null
 
       for (let i = 0; i < this.physicMemory.length; i++) {
@@ -73,16 +70,15 @@ export class MemoryManager {
           }
         }
       }
-
       if (firstProcess) {
         const sleepProcess = this.delete(firstProcess)
+        emptyFramesLength = this.findEmptyPages().length
         sleeps.push(sleepProcess)
       }
     }
 
     return sleeps
   }
-  //...
 
   public checkWrite(process: Process) {
     const emptyFrames = this.findEmptyPages()

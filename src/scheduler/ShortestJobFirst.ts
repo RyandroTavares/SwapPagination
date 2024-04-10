@@ -1,12 +1,12 @@
 import { ExecuteSchedulerResponse } from '../interfaces/ExecuteSchedulerResponse'
 import { Process } from '../process/Process'
 import { SubProcess } from '../process/SubProcess'
-import { CallType } from '../so/CallType'
-import { Operation } from '../so/Operation'
+import { SystemCallType } from '../so/SystemCallType'
+import { SystemOperation } from '../so/SystemOperation'
 import { SchedulerQueue } from './SchedulerQueue'
 import { SchedulerType } from './SchedulerType'
 
-export class IncreasingDescresing extends SchedulerQueue {
+export class ShortestJobFirst extends SchedulerQueue {
   private order: 'ASC' | 'DESC'
 
   constructor(order: 'ASC' | 'DESC' = 'ASC') {
@@ -28,7 +28,7 @@ export class IncreasingDescresing extends SchedulerQueue {
         element,
         priority: element.getProcess.getPriority,
         timeExecution: element.getProcess.getTimeExecution,
-        type: SchedulerType.INCREASING_DESCRESING,
+        type: SchedulerType.SHORTEST_JOB_FIRST,
       }
     } else {
       return undefined
@@ -42,7 +42,10 @@ export class IncreasingDescresing extends SchedulerQueue {
       const process = this.queueProcess.shift()
 
       if (process) {
-        const subProcess: SubProcess[] = Operation.systemCall(CallType.REVIEW, undefined, process) as SubProcess[]
+        const subProcess: SubProcess[] = SystemOperation.systemCall({
+          typeCall: SystemCallType.READ,
+          process,
+        }) as SubProcess[]
 
         subProcess.forEach((value) => {
           this.queueSubProcesses.push(value)
@@ -54,7 +57,10 @@ export class IncreasingDescresing extends SchedulerQueue {
       const process = this.queueProcess.shift()
 
       if (process) {
-        const subProcess: SubProcess[] = Operation.systemCall(CallType.REVIEW, undefined, process) as SubProcess[]
+        const subProcess: SubProcess[] = SystemOperation.systemCall({
+          typeCall: SystemCallType.READ,
+          process,
+        }) as SubProcess[]
 
         subProcess.forEach((value) => {
           this.queueSubProcesses.push(value)
