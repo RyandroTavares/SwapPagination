@@ -20,22 +20,27 @@ export class Core {
     type,
   }: Omit<ExecuteSchedulerResponse, 'element'>) {
     if (
-      type === SchedulerType.FIRST_COME_FIRST_SERVED ||
+      type === SchedulerType.FIRST_IN_FIRST_OUT ||
       type === SchedulerType.ROUND_ROBIN ||
       type === SchedulerType.LOTTERY
     ) {
-      console.log({ id: this._subProcess?.getId })
+      console.log(`Process: ${this._subProcess?.getId}`)
     }
 
     if (type === SchedulerType.PRIORITY) {
-      console.log({
-        id: this._subProcess?.getId,
-        priority: priority === 2,
-      })
-    }
+      if (priority < 2) {
+          console.log(`Process: ${this._subProcess?.getId} - Priority: Baixo`);
+      } else if (priority === 2) {
+          console.log(`Process: ${this._subProcess?.getId} - Priority: Médio`);
+      } else {
+          console.log(`Process: ${this._subProcess?.getId} - Priority: Crítico`);
+      }
+  }
 
-    if (type === SchedulerType.SHORTEST_JOB_FIRST) {
-      console.log({ id: this._subProcess?.getId, timeExecution })
+    if (type === SchedulerType.INCREASING_DESCRESING) {
+      console.log(
+        `Process: ${this._subProcess?.getId} - Time execution: ${timeExecution}`,
+      )
     }
 
     this.finish()

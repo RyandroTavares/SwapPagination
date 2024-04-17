@@ -1,12 +1,12 @@
 import { ExecuteSchedulerResponse } from '../interfaces/ExecuteSchedulerResponse'
 import { Process } from '../process/Process'
 import { SubProcess } from '../process/SubProcess'
-import { SystemCallType } from '../so/SystemCallType'
-import { SystemOperation } from '../so/SystemOperation'
+import { CallType } from '../so/CallType'
+import { Operation } from '../so/Operation'
 import { SchedulerQueue } from './SchedulerQueue'
 import { SchedulerType } from './SchedulerType'
 
-export class ShortestJobFirst extends SchedulerQueue {
+export class IncreasingDescresing extends SchedulerQueue {
   private order: 'ASC' | 'DESC'
 
   constructor(order: 'ASC' | 'DESC' = 'ASC') {
@@ -28,7 +28,7 @@ export class ShortestJobFirst extends SchedulerQueue {
         element,
         priority: element.getProcess.getPriority,
         timeExecution: element.getProcess.getTimeExecution,
-        type: SchedulerType.SHORTEST_JOB_FIRST,
+        type: SchedulerType.INCREASING_DESCRESING,
       }
     } else {
       return undefined
@@ -42,8 +42,8 @@ export class ShortestJobFirst extends SchedulerQueue {
       const process = this.queueProcess.shift()
 
       if (process) {
-        const subProcess: SubProcess[] = SystemOperation.systemCall({
-          typeCall: SystemCallType.READ,
+        const subProcess: SubProcess[] = Operation.call({
+          typeCall: CallType.READ_PROCESS,
           process,
         }) as SubProcess[]
 
@@ -57,8 +57,8 @@ export class ShortestJobFirst extends SchedulerQueue {
       const process = this.queueProcess.shift()
 
       if (process) {
-        const subProcess: SubProcess[] = SystemOperation.systemCall({
-          typeCall: SystemCallType.READ,
+        const subProcess: SubProcess[] = Operation.call({
+          typeCall: CallType.READ_PROCESS,
           process,
         }) as SubProcess[]
 

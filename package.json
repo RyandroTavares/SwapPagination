@@ -1,13 +1,10 @@
 {
-  "name": "so",
+  "name": "project-memory-manager",
   "version": "1.0.0",
   "description": "",
   "main": "index.ts",
   "scripts": {
-    "start": "tsx src/main.ts",
-    "lint": "eslint ./src --fix",
-    "build": "tsup src --out-dir build",
-    "build-test" :"tsc"
+    "start": "tsx src/main.ts"
   },
   "keywords": [],
   "author": "",

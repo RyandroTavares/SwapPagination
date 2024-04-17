@@ -1,25 +1,28 @@
+import { CpuManager } from '../cpu/CpuManager'
 import { ExecuteSchedulerResponse } from '../interfaces/ExecuteSchedulerResponse'
 import { Process } from '../process/Process'
 import { SubProcess } from '../process/SubProcess'
-import { SystemCallType } from '../so/SystemCallType'
-import { SystemOperation } from '../so/SystemOperation'
+import { CallType } from '../so/CallType'
+import { Operation } from '../so/Operation'
 import { SchedulerQueue } from './SchedulerQueue'
 import { SchedulerType } from './SchedulerType'
 
 export class RoundRobin extends SchedulerQueue {
   private countExecutedSubProcess: number = 0
   private processInExecution: Process | null = null
+  private graphicQuantum: Map<string, number> = new Map()
+  private quantum: number
 
-  constructor(private quantum: number) {
+  constructor(quantum: number) {
     super()
-    this.quantum = quantum
+    this.quantum = quantum * 1000
   }
 
   public addSubProcess(process: Process): void {
     this.queueProcess.push(process)
 
-    const subProcesses = SystemOperation.systemCall({
-      typeCall: SystemCallType.READ,
+    const subProcesses = Operation.call({
+      typeCall: CallType.READ_PROCESS,
       process,
     }) as SubProcess[]
 
@@ -41,36 +44,51 @@ export class RoundRobin extends SchedulerQueue {
         this.countExecutedSubProcess++
       }
 
-      if (
-        this.processInExecution &&
-        this.processInExecution.getSize < this.quantum
-      ) {
-        if (this.processInExecution.getSize === 1) {
-          this.countExecutedSubProcess = 0
-          this.queueProcess.shift()
-          this.processInExecution = this.queueProcess[0]
+      console.log(this.processInExecution?.getId)
 
-          return {
-            element,
-            priority: element.getProcess.getPriority,
-            timeExecution: element.getProcess.getTimeExecution,
-            type: SchedulerType.ROUND_ROBIN,
-          }
-        } else {
-          this.countExecutedSubProcess = 0
-          this.processInExecution = this.queueProcess[0]
+      const aux = this.queueSubProcesses.map((sp) => sp.getProcess.getId)
 
-          return {
-            element,
-            priority: element.getProcess.getPriority,
-            timeExecution: element.getProcess.getTimeExecution,
-            type: SchedulerType.ROUND_ROBIN,
-          }
-        }
+      if (!aux.includes(element.getProcess.getId)) {
+        this.queueProcess.shift()
+        this.processInExecution = this.queueProcess[0]
+        this.countExecutedSubProcess = 0
       }
 
-      if (this.countExecutedSubProcess === this.quantum) {
-        this.rotate()
+      const valueQuantum = this.graphicQuantum.get(element.getProcess.getId)
+
+      if (
+        !valueQuantum &&
+        this.countExecutedSubProcess === CpuManager.NUMBER_OF_CORES
+      ) {
+        this.graphicQuantum.set(element.getProcess.getId, CpuManager.CLOCK)
+
+        if (CpuManager.CLOCK >= this.quantum) {
+          this.rotate(element.getProcess.getId)
+        }
+
+        this.countExecutedSubProcess = 0
+      }
+
+      if (
+        valueQuantum &&
+        this.countExecutedSubProcess === CpuManager.NUMBER_OF_CORES
+      ) {
+        this.graphicQuantum.set(
+          element.getProcess.getId,
+          CpuManager.CLOCK + valueQuantum,
+        )
+
+        this.countExecutedSubProcess = 0
+      }
+
+      const value = this.graphicQuantum.get(element.getProcess.getId)
+
+      if (
+        !(CpuManager.CLOCK >= this.quantum) &&
+        value &&
+        value >= this.quantum
+      ) {
+        this.rotate(element.getProcess.getId)
       }
 
       return {
@@ -84,7 +102,7 @@ export class RoundRobin extends SchedulerQueue {
     }
   }
 
-  public rotate() {
+  public rotate(processID: string) {
     if (
       this.processInExecution &&
       this.processInExecution.getInstructions >
@@ -98,6 +116,7 @@ export class RoundRobin extends SchedulerQueue {
 
       this.processInExecution = this.queueProcess[0]
       this.countExecutedSubProcess = 0
+      this.graphicQuantum.set(processID, 0)
     }
   }
 

@@ -155,14 +155,18 @@ export class MemoryManager {
 
   private printMemory() {
     console.log(
-      '----------------------------------------------------------------------',
+      '=-=-=-=-=-=-=-=-=-=-=-=-=--=-PHYSICAL_MEMORY-=-=-=-=-=-=-=-=-=-=-=--=-=-=',
     )
     for (let page = 0; page < this.physicMemory.length; page++) {
-      const element = this.physicMemory[page].map((subProcess) => ({
-        id: subProcess?.getId,
-      }))
-
-      console.log(element)
+      let pageContent = ''
+      for (const subProcess of this.physicMemory[page]) {
+        if (subProcess) {
+          pageContent += subProcess.getId + ' | '
+        } else {
+          pageContent += 'Empty ' + '| '
+        }
+      }
+      console.log('Page ' + page + ': ' + pageContent)
     }
   }
 }

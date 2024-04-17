@@ -10,12 +10,13 @@ export class Process {
 
   public static COUNT_PROCESS = 0
 
-  constructor(size: number, priority?: number) {
+  constructor(size: number, timeExecution: number, priority?: number) {
     Process.COUNT_PROCESS++
     this.inputMemory = Date.now()
 
     this.id = `P${Process.COUNT_PROCESS}`
     this.size = size
+    this.timeExecution = timeExecution
 
     this.subProcess = []
     this.insertSubProcess()
@@ -23,13 +24,12 @@ export class Process {
     this.instructions = this.subProcess.length * 7
     this.instructionsExecuted = 0
 
-    this.timeExecution = Math.round(Math.random() * 50)
-
     const randomPriority = Math.floor(Math.random() * 2)
     this.priority = priority || randomPriority
   }
 
   private insertSubProcess() {
+    this.subProcess = [];
     for (let i = 0; i < this.getSize; i++) {
       this.subProcess.push(`${this.id}-${i}`)
     }
